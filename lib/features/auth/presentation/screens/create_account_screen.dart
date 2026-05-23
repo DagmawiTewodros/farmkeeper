@@ -1,21 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
 
-class CreateAccountScreen extends StatefulWidget {
+class CreateAccountScreen extends ConsumerStatefulWidget {
   const CreateAccountScreen({super.key});
 
   @override
-  State<CreateAccountScreen> createState() => _CreateAccountScreenState();
+  ConsumerState<CreateAccountScreen> createState() => _CreateAccountScreenState();
 }
 
-class _CreateAccountScreenState extends State<CreateAccountScreen> {
+class _CreateAccountScreenState extends ConsumerState<CreateAccountScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  bool get _canSubmit {
+    return _nameController.text.trim().isNotEmpty &&
+        _emailController.text.trim().isNotEmpty &&
+        _passwordController.text.trim().isNotEmpty;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.addListener(_onInputChanged);
+    _emailController.addListener(_onInputChanged);
+    _passwordController.addListener(_onInputChanged);
+  }
+
+  void _onInputChanged() {
+    setState(() {});
+  }
+
   @override
   void dispose() {
+    _nameController.removeListener(_onInputChanged);
+    _emailController.removeListener(_onInputChanged);
+    _passwordController.removeListener(_onInputChanged);
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -104,9 +127,12 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   icon: Icons.mail_outline,
                   controller: _emailController,
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Email is required';
-                    if (!value.contains('@') || !value.contains('.')) 
+                    if (value == null || value.isEmpty) {
+                      return 'Email is required';
+                    }
+                    if (!value.contains('@') || !value.contains('.')) {
                       return 'Enter a valid email address';
+                    }
                     return null;
                   },
                 ),
@@ -130,14 +156,33 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 // Create Account Button
                 SizedBox(
                   height: 56,
-                  child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState?.validate() ?? false) {
-                      context.go('/onboarding2_screen');
-                    }
-                  },
+                  child: Builder(builder: (context) {
+                    final authState = ref.watch(authNotifierProvider);
+                    final isLoading = authState.isLoading;
+                    final canSubmit = _canSubmit && !isLoading;
+                    final goRouter = GoRouter.of(context);
+                    return ElevatedButton(
+                      onPressed: canSubmit
+                          ? () async {
+                              if (!(_formKey.currentState?.validate() ?? false)) {
+                                return;
+                              }
+                              try {
+                                await ref.read(authNotifierProvider.notifier).register(
+                                  _nameController.text.trim(),
+                                  _emailController.text.trim(),
+                                  _passwordController.text.trim(),
+                                );
+                                if (!mounted) return;
+                                goRouter.go('/home');
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                              }
+                            }
+                          : null,
                      style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF2E7D32), // Match button green
+                      disabledBackgroundColor: Color(0xFF2E7D32).withValues(alpha: 0.35),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -151,7 +196,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
+                  );
+                }),
                 ),
                 const SizedBox(height: 32),
                 
@@ -184,11 +230,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         text: 'Google',
                         // Using an asset for the colored Google logo is best. 
                         // You can replace this NetworkImage with Image.asset('assets/icons/google.png')
-                        iconWidget: Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg', 
-                          height: 20,
-                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
-                        ),
+                        iconWidget: const Icon(Icons.g_mobiledata, color: Colors.black, size: 28),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -296,7 +338,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   // Helper method for social buttons
   Widget _buildSocialButton({required String text, required Widget iconWidget}) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Continue with $text is not implemented yet.'),
+        ));
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,

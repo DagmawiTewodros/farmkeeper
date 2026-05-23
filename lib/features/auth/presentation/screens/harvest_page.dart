@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../crops/domain/crop.dart';
+import '../../../crops/presentation/providers/crop_provider.dart';
 
-class HarvestPage extends StatelessWidget {
+class HarvestPage extends ConsumerWidget {
   const HarvestPage({super.key});
 
   static const Color bgColor = Color(0xffF6F8F1);
@@ -10,7 +14,8 @@ class HarvestPage extends StatelessWidget {
   static const Color cardGrey = Color(0xffE9EDE0);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cropsState = ref.watch(cropsProvider);
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
@@ -34,11 +39,15 @@ class HarvestPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Search saved.')));
+            },
             icon: const Icon(Icons.search, color: Colors.grey),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () => context.push('/settings_screen'),
             icon: const Icon(Icons.settings, color: darkGreen),
           ),
         ],
@@ -46,6 +55,58 @@ class HarvestPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildCropHeader(cropsState),
+            const SizedBox(height: 25),
+            _buildMaturityCard(cropsState),
+            const SizedBox(height: 20),
+            _buildInputSection(context),
+            const SizedBox(height: 20),
+            _buildLightInfoCard(),
+            const SizedBox(height: 20),
+            _buildStatsGrid(cropsState),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCropHeader(AsyncValue<List<Crop>> cropsState) {
+    return cropsState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
+      data: (crops) {
+        if (crops.isEmpty) {
+          return const Center(child: Text('No crops added yet.'));
+        }
+        final crop = crops.first;
+
+        String statusText = 'GROWING';
+        Color statusColor = Colors.green;
+
+        if (crop.harvestTime != null) {
+          final harvestDateParts = crop.harvestTime!.split('/');
+          if (harvestDateParts.length == 3) {
+            final harvestDate = DateTime(
+              int.parse(harvestDateParts[2]),
+              int.parse(harvestDateParts[1]),
+              int.parse(harvestDateParts[0]),
+            );
+            final daysUntilHarvest = harvestDate
+                .difference(DateTime.now())
+                .inDays;
+            if (daysUntilHarvest <= 0) {
+              statusText = 'READY FOR HARVEST';
+              statusColor = accentOrange;
+            } else if (daysUntilHarvest <= 7) {
+              statusText = 'NEAR HARVEST';
+              statusColor = Colors.orange;
+            }
+          }
+        }
+
+        return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
@@ -58,9 +119,9 @@ class HarvestPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              "Heirloom Roma\nTomato",
-              style: TextStyle(
+            Text(
+              crop.name,
+              style: const TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.w900,
                 height: 1.1,
@@ -70,17 +131,17 @@ class HarvestPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: accentOrange,
+                color: statusColor,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.info, color: Colors.white, size: 16),
-                  SizedBox(width: 8),
+                  const Icon(Icons.info, color: Colors.white, size: 16),
+                  const SizedBox(width: 8),
                   Text(
-                    "READY FOR HARVEST",
-                    style: TextStyle(
+                    statusText,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
@@ -89,90 +150,132 @@ class HarvestPage extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 25),
-
-            _buildMaturityCard(),
-            const SizedBox(height: 20),
-            _buildInputSection(),
-            const SizedBox(height: 20),
-            _buildLightInfoCard(),
-            const SizedBox(height: 20),
-            _buildStatsGrid(),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildMaturityCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Column(
-        children: [
-          const Text(
-            "MATURITY PROGRESS",
-            style: TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.1,
-              fontSize: 12,
+  Widget _buildMaturityCard(AsyncValue<List<Crop>> cropsState) {
+    return cropsState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
+      data: (crops) {
+        if (crops.isEmpty) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(32),
             ),
+            child: const Center(child: Text('No crops added yet.')),
+          );
+        }
+        final crop = crops.first;
+        final plantedDate =
+            DateTime.tryParse(crop.plantedDate) ?? DateTime.now();
+        final daysSincePlanting = DateTime.now().difference(plantedDate).inDays;
+
+        double progress = 0.5;
+        String harvestInfo = 'No harvest date set';
+
+        if (crop.harvestTime != null) {
+          final harvestDateParts = crop.harvestTime!.split('/');
+          if (harvestDateParts.length == 3) {
+            final harvestDate = DateTime(
+              int.parse(harvestDateParts[2]),
+              int.parse(harvestDateParts[1]),
+              int.parse(harvestDateParts[0]),
+            );
+            final totalDays = harvestDate.difference(plantedDate).inDays;
+            progress = (daysSincePlanting / totalDays).clamp(0.0, 1.0);
+            final daysUntilHarvest = harvestDate
+                .difference(DateTime.now())
+                .inDays;
+            if (daysUntilHarvest <= 0) {
+              harvestInfo = 'Ready for harvest!';
+            } else {
+              harvestInfo = '$daysUntilHarvest days until harvest';
+            }
+          }
+        }
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(32),
           ),
-          const SizedBox(height: 30),
-          Stack(
-            alignment: Alignment.center,
+          child: Column(
             children: [
-              SizedBox(
-                height: 180,
-                width: 180,
-                child: CircularProgressIndicator(
-                  value: 0.9,
-                  strokeWidth: 12,
-                  backgroundColor: Colors.grey.shade200,
-                  valueColor: const AlwaysStoppedAnimation<Color>(darkGreen),
+              const Text(
+                "MATURITY PROGRESS",
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                  fontSize: 12,
                 ),
               ),
-              const Column(
+              const SizedBox(height: 30),
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  Text(
-                    "90%",
-                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900),
-                  ),
-                  Text(
-                    "DAY 68 OF 75",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(
+                    height: 180,
+                    width: 180,
+                    child: CircularProgressIndicator(
+                      value: progress,
+                      strokeWidth: 12,
+                      backgroundColor: Colors.grey.shade200,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        darkGreen,
+                      ),
                     ),
+                  ),
+                  Column(
+                    children: [
+                      Text(
+                        "${(progress * 100).toInt()}%",
+                        style: const TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      Text(
+                        harvestInfo,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _InfoColumn(title: "PLANTED", value: crop.plantedDate),
+                  _InfoColumn(
+                    title: "WATERING",
+                    value: "EVERY ${crop.wateringIntervalDays} DAYS",
+                    valueColor: textBrown,
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 40),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _InfoColumn(title: "EXPECTED DATE", value: "Oct 24,\n2023"),
-              _InfoColumn(
-                title: "WINDOW CLOSES",
-                value: "In 48 Hours",
-                valueColor: textBrown,
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildInputSection() {
+  Widget _buildInputSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -249,7 +352,11 @@ class HarvestPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Harvest entry saved.')),
+                );
+              },
               icon: const Icon(Icons.check_circle_outline, color: Colors.white),
               label: const Text(
                 "Confirm Harvest Entry",
@@ -299,20 +406,32 @@ class HarvestPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsGrid() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 2.2,
-      children: [
-        _buildSmallStat("NUTRIENT EC", "2.4 mS"),
-        _buildSmallStat("WATER PH", "5.8"),
-        _buildSmallStat("PEST RISK", "Low", valueColor: Colors.green),
-        _buildSmallStat("YIELD TREND", "+12%", valueColor: textBrown),
-      ],
+  Widget _buildStatsGrid(AsyncValue<List<Crop>> cropsState) {
+    return cropsState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
+      data: (crops) {
+        if (crops.isEmpty) {
+          return const Center(child: Text('No crops added yet.'));
+        }
+        final crop = crops.first;
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 2.2,
+          children: [
+            _buildSmallStat("NUTRIENT EC", "2.4 mS"),
+            _buildSmallStat("WATER PH", "5.8"),
+            _buildSmallStat("PEST RISK", "Low", valueColor: Colors.green),
+            _buildSmallStat("YIELD TREND", "+12%", valueColor: textBrown),
+            _buildSmallStat("CROP TYPE", crop.name),
+            _buildSmallStat("INTERVAL", "${crop.wateringIntervalDays} DAYS"),
+          ],
+        );
+      },
     );
   }
 

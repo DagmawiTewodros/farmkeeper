@@ -26,9 +26,12 @@ class WateringReminderScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -58,7 +61,11 @@ class WateringReminderScreen extends StatelessWidget {
                       child: const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(Icons.water_drop_outlined, color: Color(0xFF1B5E20), size: 32),
+                          Icon(
+                            Icons.water_drop_outlined,
+                            color: Color(0xFF1B5E20),
+                            size: 32,
+                          ),
                           Spacer(),
                           Text(
                             'Watering\nReminder',
@@ -71,7 +78,11 @@ class WateringReminderScreen extends StatelessWidget {
                           SizedBox(height: 4),
                           Text(
                             'Active for Sector A-4',
-                            style: TextStyle(fontSize: 12, color: Color(0xFF9E6D42), fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF9E6D42),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -89,7 +100,11 @@ class WateringReminderScreen extends StatelessWidget {
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.notifications_active, color: Colors.white, size: 32),
+                          Icon(
+                            Icons.notifications_active,
+                            color: Colors.white,
+                            size: 32,
+                          ),
                           SizedBox(height: 12),
                           Text(
                             'ALERTS\nON',
@@ -118,15 +133,31 @@ class WateringReminderScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Column(
                         children: [
-                          Text('OCT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54)),
-                          Text('12', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                          Text(
+                            'OCT',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Text(
+                            '12',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -137,17 +168,27 @@ class WateringReminderScreen extends StatelessWidget {
                         children: [
                           const Text(
                             'Next Irrigation Cycle',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Starts in 4 hours • 12.4 Liters estimated',
-                            style: TextStyle(fontSize: 12, color: Colors.black.withOpacity(0.6)),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.calendar_today_outlined, color: Colors.black45, size: 20),
+                    const Icon(
+                      Icons.calendar_today_outlined,
+                      color: Colors.black45,
+                      size: 20,
+                    ),
                   ],
                 ),
               ),
@@ -157,14 +198,22 @@ class WateringReminderScreen extends StatelessWidget {
                 child: Text(
                   'Never Miss\na Task',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, height: 1.1),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    height: 1.1,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
               const Text(
                 'Precision agriculture depends on timing. Our smart notification system uses satellite data and soil sensors to build automated schedules that adapt to weather shifts.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54, height: 1.5),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black54,
+                  height: 1.5,
+                ),
               ),
               const SizedBox(height: 40),
 
@@ -191,9 +240,14 @@ class WateringReminderScreen extends StatelessWidget {
                           backgroundColor: const Color(0xFF81D483),
                           foregroundColor: const Color(0xFF1B5E20),
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
                         ),
-                        child: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Back',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
@@ -209,18 +263,23 @@ class WateringReminderScreen extends StatelessWidget {
                           backgroundColor: const Color(0xFF1B5E20),
                           foregroundColor: Colors.white,
                           elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
                         ),
-                        child: const Text('Next', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Next',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              
+
               TextButton(
-                onPressed: () {},
+                onPressed: () => context.go('/login_screen'),
                 child: const Text(
                   'SKIP ONBOARDING',
                   style: TextStyle(
@@ -243,13 +302,20 @@ class WateringReminderScreen extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: const BoxDecoration(color: Color(0xFFD7F1D8), shape: BoxShape.circle),
+          decoration: const BoxDecoration(
+            color: Color(0xFFD7F1D8),
+            shape: BoxShape.circle,
+          ),
           child: Icon(icon, size: 20, color: const Color(0xFF1B5E20)),
         ),
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey),
+          style: const TextStyle(
+            fontSize: 9,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
         ),
       ],
     );

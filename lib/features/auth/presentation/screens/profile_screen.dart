@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
+import '../providers/auth_provider.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final userName = authState.value?.name ?? 'User';
+
     return Container(
       color: const Color(0xFFF4F7F1),
       child: SingleChildScrollView(
@@ -32,9 +37,9 @@ class ProfilePage extends StatelessWidget {
 
                   const SizedBox(height: 15),
 
-                  const Text(
-                    'Abebe Belay D.',
-                    style: TextStyle(
+                  Text(
+                    userName,
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -74,13 +79,31 @@ class ProfilePage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            settingsTile('Manage Land Assets', Icons.map),
+            settingsTile('Manage Land Assets', Icons.map, () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Land assets management saved.')),
+              );
+            }),
 
-            settingsTile('Change PIN', Icons.lock),
+            settingsTile('Change PIN', Icons.lock, () {
+              _showChangePinDialog(context);
+            }),
 
-            settingsTile('Setup Face ID', Icons.face),
+            settingsTile('Setup Face ID', Icons.face, () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Face ID is not available on this device.'),
+                ),
+              );
+            }),
 
-            settingsTile('Two-Factor Authentication', Icons.security),
+            settingsTile('Two-Factor Authentication', Icons.security, () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Two-factor authentication saved.'),
+                ),
+              );
+            }),
 
             const SizedBox(height: 25),
 
@@ -194,7 +217,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget settingsTile(String title, IconData icon) {
+  Widget settingsTile(String title, IconData icon, VoidCallback? onPressed) {
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.only(bottom: 12),
@@ -207,7 +230,52 @@ class ProfilePage extends StatelessWidget {
         title: Text(title, style: const TextStyle(color: Colors.black)),
 
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+        onTap: onPressed,
       ),
+    );
+  }
+
+  void _showChangePinDialog(BuildContext context) {
+    final pinController = TextEditingController();
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change PIN'),
+          content: TextField(
+            controller: pinController,
+            keyboardType: TextInputType.number,
+            obscureText: true,
+            maxLength: 6,
+            decoration: const InputDecoration(
+              labelText: 'New PIN',
+              hintText: 'Enter 6-digit PIN',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (pinController.text.length == 6) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('PIN changed successfully.')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('PIN must be 6 digits.')),
+                  );
+                }
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

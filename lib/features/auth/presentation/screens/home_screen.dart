@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final userName = authState.value?.name ?? 'User';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7F1),
 
@@ -17,9 +21,9 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
 
             children: [
-              const Text(
-                'MORNING, ABEBE BELAY D.',
-                style: TextStyle(
+              Text(
+                'MORNING, ${userName.toUpperCase()}.',
+                style: const TextStyle(
                   color: Color(0xFFB57F4D),
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
@@ -43,9 +47,7 @@ class HomeScreen extends StatelessWidget {
 
                     TextSpan(
                       text: 'thriving',
-                      style: TextStyle(
-                        color: Color(0xFF2E7D32),
-                      ),
+                      style: TextStyle(color: Color(0xFF2E7D32)),
                     ),
 
                     TextSpan(text: '.'),
@@ -188,13 +190,11 @@ class HomeScreen extends StatelessWidget {
 
                   children: [
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                       children: [
                         Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
 
                           children: const [
                             Text(
@@ -216,10 +216,7 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
 
-                        const Icon(
-                          Icons.bar_chart,
-                          color: Colors.grey,
-                        ),
+                        const Icon(Icons.bar_chart, color: Colors.grey),
                       ],
                     ),
 
@@ -238,8 +235,7 @@ class HomeScreen extends StatelessWidget {
                               value: 0.78,
                               strokeWidth: 12,
                               backgroundColor: Colors.white,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(
+                              valueColor: AlwaysStoppedAnimation<Color>(
                                 Color(0xFF1B5E20),
                               ),
                             ),
@@ -288,8 +284,7 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                       children: [
                         _buildLegendItem(
@@ -336,15 +331,10 @@ class HomeScreen extends StatelessWidget {
 
         children: [
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
             children: [
-              Icon(
-                icon,
-                color: iconColor,
-                size: 24,
-              ),
+              Icon(icon, color: iconColor, size: 24),
 
               if (badge != null)
                 Container(
@@ -394,20 +384,14 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLegendItem(
-    Color color,
-    String text,
-  ) {
+  Widget _buildLegendItem(Color color, String text) {
     return Row(
       children: [
         Container(
           width: 8,
           height: 8,
 
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
 
         const SizedBox(width: 6),

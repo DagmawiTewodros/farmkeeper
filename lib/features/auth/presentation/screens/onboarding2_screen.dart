@@ -43,7 +43,10 @@ class OnboardingAnalyticsScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 10.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -139,7 +142,9 @@ class OnboardingAnalyticsScreen extends StatelessWidget {
                                 width: 8,
                                 height: 20.0 + (index * 10),
                                 decoration: BoxDecoration(
-                                  color: index == 0 ? Colors.grey.shade200 : const Color(0xFF1B5E20),
+                                  color: index == 0
+                                      ? Colors.grey.shade200
+                                      : const Color(0xFF1B5E20),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               );
@@ -151,11 +156,11 @@ class OnboardingAnalyticsScreen extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: Image.asset(
-                              'assets/images/overlay.png',
-                              height: 180,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                          'assets/images/overlay.png',
+                          height: 180,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ],
                   ),
@@ -196,7 +201,11 @@ class OnboardingAnalyticsScreen extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.auto_awesome, color: Color(0xFF1B5E20), size: 24),
+                      const Icon(
+                        Icons.auto_awesome,
+                        color: Color(0xFF1B5E20),
+                        size: 24,
+                      ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: Column(
@@ -215,7 +224,7 @@ class OnboardingAnalyticsScreen extends StatelessWidget {
                               "Our algorithms analyze weather patterns, satellite imagery, and sensor data to provide a digital blueprint for your farm's success.",
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.black.withOpacity(0.6),
+                                color: Colors.black.withValues(alpha: 0.6),
                                 height: 1.4,
                               ),
                             ),
@@ -262,10 +271,7 @@ class OnboardingAnalyticsScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: bgColor,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: bgColor, shape: BoxShape.circle),
             child: Icon(icon, color: iconColor, size: 20),
           ),
           const SizedBox(height: 24),

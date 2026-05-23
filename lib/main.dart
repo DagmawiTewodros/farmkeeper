@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/themes.dart';
 
 void main() {
-  runApp(const FarmKeeperApp());
+  runApp(const ProviderScope(child: FarmKeeperApp()));
 }
 
 class FarmKeeperApp extends StatelessWidget {

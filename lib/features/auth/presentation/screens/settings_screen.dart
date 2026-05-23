@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
+import '../providers/auth_provider.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool pushNotifications = true;
   bool weatherAlerts = true;
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    final userName = authState.value?.name ?? 'User';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7F1),
       appBar: AppBar(
@@ -52,9 +57,9 @@ class _SettingsPageState extends State<SettingsPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Abebe Belay D.',
-                        style: TextStyle(
+                      Text(
+                        userName,
+                        style: const TextStyle(
                           color: Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -188,7 +193,7 @@ class _SettingsPageState extends State<SettingsPage> {
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: SwitchListTile(
-        activeColor: const Color(0xFF2E7D32),
+        activeThumbColor: const Color(0xFF2E7D32),
         value: value,
         onChanged: onChanged,
         title: Text(title, style: const TextStyle(color: Colors.black)),

@@ -20,7 +20,8 @@ class MainAppScreen extends StatefulWidget {
   State<MainAppScreen> createState() => _MainAppScreenState();
 }
 
-class _MainAppScreenState extends State<MainAppScreen> with TickerProviderStateMixin {
+class _MainAppScreenState extends State<MainAppScreen>
+    with TickerProviderStateMixin {
   late int _selectedIndex;
   bool _isCropsModule = false;
   late AnimationController _animationController;
@@ -45,26 +46,24 @@ class _MainAppScreenState extends State<MainAppScreen> with TickerProviderStateM
   late List<Widget> _mainScreens;
   late List<Widget> _cropsScreens;
 
-  List<Widget> get _currentScreens => _isCropsModule ? _cropsScreens : _mainScreens;
-  List<NavItem> get _currentNavItems => _isCropsModule ? _cropsNavItems : _mainNavItems;
+  List<Widget> get _currentScreens =>
+      _isCropsModule ? _cropsScreens : _mainScreens;
+  List<NavItem> get _currentNavItems =>
+      _isCropsModule ? _cropsNavItems : _mainNavItems;
 
   @override
   void initState() {
     super.initState();
     _selectedIndex = widget.initialIndex;
-    
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
     _mainScreens = [
       const HomeScreen(),
@@ -123,40 +122,56 @@ class _MainAppScreenState extends State<MainAppScreen> with TickerProviderStateM
     return BottomNavbar(
       child: FadeTransition(
         opacity: _fadeAnimation,
-        child: IndexedStack(
-          index: _selectedIndex,
-          children: _currentScreens,
-        ),
+        child: IndexedStack(index: _selectedIndex, children: _currentScreens),
       ),
       items: _currentNavItems,
-      floatingActionButton: (!_isCropsModule && _selectedIndex == 2) ? FloatingActionButton(
-        backgroundColor: const Color(0xFF2E7D32),
-        onPressed: () {},
-        child: const Icon(Icons.add, color: Colors.white),
-      ) : null,
-      appBar: (!_isCropsModule && _selectedIndex == 4) ? AppBar(
-        backgroundColor: const Color(0xFFF4F7F1),
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          'Profile',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.black),
-            onPressed: () {
-              context.push('/settings_screen');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {
-              context.push('/notifications_screen');
-            },
-          ),
-        ],
-      ) : null,
+      floatingActionButton: (!_isCropsModule && _selectedIndex == 2)
+          ? FloatingActionButton(
+              backgroundColor: const Color(0xFF2E7D32),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Use Add Task to create a local task.'),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add, color: Colors.white),
+            )
+          : null,
+      appBar: (!_isCropsModule && _selectedIndex == 4)
+          ? AppBar(
+              backgroundColor: const Color(0xFFF4F7F1),
+              elevation: 0,
+              centerTitle: true,
+              title: const Text(
+                'Profile',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.settings_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    context.push('/settings_screen');
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    context.push('/notifications_screen');
+                  },
+                ),
+              ],
+            )
+          : null,
       onNavItemTapped: _onItemTapped,
       currentIndex: _selectedIndex,
     );

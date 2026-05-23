@@ -1,20 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../widgets/bottom_navbar.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/auth/presentation/screens/home_screen.dart';
 import '../../features/auth/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/notifications_screen.dart';
-import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/auth/presentation/screens/settings_screen.dart';
 import '../../features/auth/presentation/screens/create_account_screen.dart';
 import '../../features/auth/presentation/screens/onboarding2_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/reminder_screen.dart';
-import '../../features/auth/presentation/screens/statstics_dashboard_screen.dart';
-import '../../features/auth/presentation/screens/weather_screen.dart';
-import '../../features/auth/presentation/screens/tasks_screen.dart';
 import '../../features/auth/presentation/screens/calendar_screen.dart';
 import '../../features/auth/presentation/screens/main_app_screen.dart';
 

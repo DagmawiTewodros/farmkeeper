@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/themes.dart';
+import '../../../crops/domain/crop.dart';
+import '../../../crops/presentation/providers/crop_provider.dart';
 
-class WateringPage extends StatelessWidget {
+class WateringPage extends ConsumerWidget {
   const WateringPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cropsState = ref.watch(cropsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           children: [
-            _buildCropFocusCard(),
+            _buildCropFocusCard(context, cropsState),
             const SizedBox(height: 24),
-            _buildIntervalsSection(),
+            _buildIntervalsSection(cropsState),
             const SizedBox(height: 24),
             _buildHydrationHealthCard(),
             const SizedBox(height: 24),
@@ -27,7 +32,7 @@ class WateringPage extends StatelessWidget {
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -60,138 +65,198 @@ class WateringPage extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          onPressed: () {},
+          onPressed: () => context.push('/settings_screen'),
           icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
         ),
       ],
     );
   }
 
-  Widget _buildCropFocusCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.cardGrey,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "CROP FOCUS",
-            style: TextStyle(
-              color: AppColors.accentBrown,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            "Heritage\nTomatoes",
-            style: TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.w900,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            "Management of precision hydration for Plot A-12. The soil moisture levels are currently at 42%.",
-            style: TextStyle(color: AppColors.textGrey, fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              minimumSize: const Size(double.infinity, 54),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-            onPressed: () {},
-            icon: const Icon(Icons.opacity, color: Colors.white),
-            label: const Text(
-              "Mark as Watered",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+  Widget _buildCropFocusCard(
+    BuildContext context,
+    AsyncValue<List<Crop>> cropsState,
+  ) {
+    return cropsState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
+      data: (crops) {
+        if (crops.isEmpty) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              color: AppColors.cardGrey,
+              borderRadius: BorderRadius.circular(32),
             ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.calendar_today_outlined,
-                  size: 16,
-                  color: AppColors.accentBrown,
-                ),
-                SizedBox(width: 8),
-                Text(
-                  "NEXT: AUG 24, 08:00 AM",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-              ],
-            ),
+            child: const Center(child: Text('No crops added yet.')),
+          );
+        }
+        final crop = crops.first;
+        final nextWatering = _calculateNextWatering(crop);
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.cardGrey,
+            borderRadius: BorderRadius.circular(32),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIntervalsSection() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
-      ),
-      child: Column(
-        children: [
-          const Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.access_time, color: AppColors.primary),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  "Watering\nIntervals",
+              const Text(
+                "CROP FOCUS",
+                style: TextStyle(
+                  color: AppColors.accentBrown,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                crop.name,
+                style: const TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Watering interval: ${crop.wateringIntervalDays} days. Planted on ${crop.plantedDate}.",
+                style: const TextStyle(
+                  color: AppColors.textGrey,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  minimumSize: const Size(double.infinity, 54),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Watering recorded.')),
+                  );
+                },
+                icon: const Icon(Icons.opacity, color: Colors.white),
+                label: const Text(
+                  "Mark as Watered",
                   style: TextStyle(
-                    fontSize: 18,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    height: 1.1,
                   ),
                 ),
               ),
-              Text(
-                "EDITING\nENABLED",
-                style: TextStyle(
-                  color: AppColors.accentBrown,
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                textAlign: TextAlign.right,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.calendar_today_outlined,
+                      size: 16,
+                      color: AppColors.accentBrown,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "NEXT: $nextWatering",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _intervalTile("1", "EVERY DAY", true),
-          const SizedBox(height: 12),
-          _intervalTile("2", "EVERY 2 DAYS", false),
-          const SizedBox(height: 12),
-          _intervalTile("3", "EVERY 3 DAYS", false),
-          const SizedBox(height: 20),
-          _buildSmartAdaptationToggle(),
-        ],
-      ),
+        );
+      },
+    );
+  }
+
+  String _calculateNextWatering(Crop crop) {
+    final plantedDate = DateTime.tryParse(crop.plantedDate) ?? DateTime.now();
+    final nextWatering = plantedDate.add(
+      Duration(days: crop.wateringIntervalDays),
+    );
+    return '${nextWatering.month}/${nextWatering.day}';
+  }
+
+  Widget _buildIntervalsSection(AsyncValue<List<Crop>> cropsState) {
+    return cropsState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text(error.toString())),
+      data: (crops) {
+        if (crops.isEmpty) {
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(32),
+            ),
+            child: const Center(child: Text('No crops added yet.')),
+          );
+        }
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Column(
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.access_time, color: AppColors.primary),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "Watering\nIntervals",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.1,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    "CROP\nBASED",
+                    style: TextStyle(
+                      color: AppColors.accentBrown,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ...crops.map(
+                (crop) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _intervalTile(
+                    crop.wateringIntervalDays.toString(),
+                    "${crop.name.toUpperCase()} - EVERY ${crop.wateringIntervalDays} DAYS",
+                    false,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -201,7 +266,9 @@ class WateringPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: isSelected ? Colors.transparent : AppColors.cardGrey,
-        border: isSelected ? Border.all(color: AppColors.primary, width: 1.5) : null,
+        border: isSelected
+            ? Border.all(color: AppColors.primary, width: 1.5)
+            : null,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -218,44 +285,6 @@ class WateringPage extends StatelessWidget {
               color: AppColors.primary,
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSmartAdaptationToggle() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardGrey,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "SMART ADAPTATION",
-                  style: TextStyle(
-                    color: AppColors.accentBrown,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  "Weather-based override",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-                Text(
-                  "Automatically skip if rain >80%",
-                  style: TextStyle(color: AppColors.textGrey, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          Switch(value: true, onChanged: (v) {}, activeColor: AppColors.primary),
         ],
       ),
     );
@@ -286,7 +315,9 @@ class WateringPage extends StatelessWidget {
                   value: 0.75,
                   strokeWidth: 12,
                   backgroundColor: AppColors.cardGrey,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.primary,
+                  ),
                 ),
               ),
               const Column(
@@ -389,7 +420,10 @@ class WateringPage extends StatelessWidget {
                 Text(date, style: const TextStyle(fontWeight: FontWeight.bold)),
                 Text(
                   subtitle,
-                  style: const TextStyle(color: AppColors.textGrey, fontSize: 11),
+                  style: const TextStyle(
+                    color: AppColors.textGrey,
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),

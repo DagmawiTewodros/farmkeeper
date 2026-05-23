@@ -9,14 +9,12 @@ class ConfirmationDialog extends StatelessWidget {
   final Color confirmColor;
   final String route;
 
-  const ConfirmationDialog.signOut({
-    super.key,
-    required this.route,
-  })  : title = 'Sign Out',
-        message = 'Are you sure you want to sign out?',
-        confirmText = 'SIGN OUT',
-        cancelText = 'CANCEL',
-        confirmColor = Colors.red;
+  const ConfirmationDialog.signOut({super.key, required this.route})
+    : title = 'Sign Out',
+      message = 'Are you sure you want to sign out?',
+      confirmText = 'SIGN OUT',
+      cancelText = 'CANCEL',
+      confirmColor = Colors.red;
 
   const ConfirmationDialog({
     super.key,
@@ -31,9 +29,7 @@ class ConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -42,31 +38,21 @@ class ConfirmationDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: confirmColor.withOpacity(0.1),
+                color: confirmColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.logout,
-                color: confirmColor,
-                size: 32,
-              ),
+              child: Icon(Icons.logout, color: confirmColor, size: 32),
             ),
             const SizedBox(height: 20),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 24),
             Row(
