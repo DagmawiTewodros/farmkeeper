@@ -1,0 +1,36 @@
+﻿{"protocolVersion":"0.1.1","runnerVersion":"1.30.0","pid":9976,"type":"start","time":0}
+{"suite":{"id":0,"platform":"vm","path":"D:/final project/farmkeeper/test/add_crop_widget_test.dart"},"type":"suite","time":0}
+{"test":{"id":1,"name":"loading D:/final project/farmkeeper/test/add_crop_widget_test.dart","suiteID":0,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":2}
+{"suite":{"id":2,"platform":"vm","path":"D:/final project/farmkeeper/test/crop_model_test.dart"},"type":"suite","time":10}
+{"test":{"id":3,"name":"loading D:/final project/farmkeeper/test/crop_model_test.dart","suiteID":2,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":10}
+{"suite":{"id":4,"platform":"vm","path":"D:/final project/farmkeeper/test/riverpod_providers_test.dart"},"type":"suite","time":10}
+{"test":{"id":5,"name":"loading D:/final project/farmkeeper/test/riverpod_providers_test.dart","suiteID":4,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":11}
+{"suite":{"id":6,"platform":"vm","path":"D:/final project/farmkeeper/test/widget_test.dart"},"type":"suite","time":12}
+{"test":{"id":7,"name":"loading D:/final project/farmkeeper/test/widget_test.dart","suiteID":6,"groupIDs":[],"metadata":{"skip":false,"skipReason":null},"line":null,"column":null,"url":null},"type":"testStart","time":12}
+{"count":4,"time":12,"type":"allSuites"}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":1,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4230}
+{"group":{"id":8,"suiteID":0,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":4241}
+{"test":{"id":9,"name":"AddCropPage saves crop and pops","suiteID":0,"groupIDs":[8],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":26,"root_column":3,"root_url":"file:///D:/final%20project/farmkeeper/test/add_crop_widget_test.dart"},"type":"testStart","time":4242}
+{"testID":3,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4247}
+{"group":{"id":10,"suiteID":2,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":4247}
+{"test":{"id":11,"name":"Crop toMap and fromMap roundtrip","suiteID":2,"groupIDs":[10],"metadata":{"skip":false,"skipReason":null},"line":5,"column":3,"url":"file:///D:/final%20project/farmkeeper/test/crop_model_test.dart"},"type":"testStart","time":4247}
+{"testID":11,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4300}
+{"testID":5,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":4791}
+{"group":{"id":12,"suiteID":4,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":4792}
+{"test":{"id":13,"name":"cropsProvider returns list from repository","suiteID":4,"groupIDs":[12],"metadata":{"skip":false,"skipReason":null},"line":22,"column":3,"url":"file:///D:/final%20project/farmkeeper/test/riverpod_providers_test.dart"},"type":"testStart","time":4793}
+
+[{"event":"test.startedProcess","params":{"vmServiceUri":null}}]
+{"testID":13,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":4975}
+{"testID":7,"result":"success","skipped":false,"hidden":true,"type":"testDone","time":6044}
+{"group":{"id":14,"suiteID":6,"parentID":null,"name":"","metadata":{"skip":false,"skipReason":null},"testCount":1,"line":null,"column":null,"url":null},"type":"group","time":6044}
+{"test":{"id":15,"name":"App initialization smoke test","suiteID":6,"groupIDs":[14],"metadata":{"skip":false,"skipReason":null},"line":174,"column":5,"url":"package:flutter_test/src/widget_tester.dart","root_line":6,"root_column":3,"root_url":"file:///D:/final%20project/farmkeeper/test/widget_test.dart"},"type":"testStart","time":6045}
+{"testID":15,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7638}
+{"testID":9,"result":"success","skipped":false,"hidden":false,"type":"testDone","time":7755}
+{"success":true,"type":"done","time":7817}
+
