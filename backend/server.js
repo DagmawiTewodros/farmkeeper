@@ -8,6 +8,7 @@ const journalRoutes = require('./routes/journalRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const exportRoutes = require('./routes/exportRoutes');
 const calendarRoutes = require('./routes/calendarRoutes');
+const tasksRoutes = require('./routes/tasksRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ app.use('/api/journal', journalRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/calendar', calendarRoutes);
+app.use('/api/tasks', tasksRoutes);
 
 // Start Server locally
 app.listen(PORT, () => {

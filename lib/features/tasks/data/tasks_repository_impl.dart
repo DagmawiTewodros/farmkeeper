@@ -1,37 +1,36 @@
 import '../domain/task.dart';
-import 'tasks_local_datasource.dart';
+import 'tasks_remote_datasource.dart';
 import 'tasks_repository.dart';
 
 class TasksRepositoryImpl implements TasksRepository {
-  final TasksLocalDataSource localDataSource;
+  final TasksRemoteDataSource remoteDataSource;
 
-  const TasksRepositoryImpl(this.localDataSource);
+  const TasksRepositoryImpl(this.remoteDataSource);
 
   @override
   Future<void> addTask(Task task) {
-    return localDataSource.insertTask(task);
+    return remoteDataSource.createTask(task);
   }
 
   @override
   Future<List<Task>> getTasks() async {
-    final cachedTasks = await localDataSource.getAllTasks();
-    if (cachedTasks.isNotEmpty) return cachedTasks;
-    return [];
+    final tasks = await remoteDataSource.getAllTasks();
+    return tasks;
   }
 
   @override
   Future<Task?> getTaskById(String id) {
-    return localDataSource.getTaskById(id);
+    return remoteDataSource.getTaskById(id);
   }
 
   @override
   Future<void> updateTask(Task task) {
-    return localDataSource.updateTask(task);
+    return remoteDataSource.updateTask(task);
   }
 
   @override
   Future<void> deleteTask(String id) {
-    return localDataSource.deleteTask(id);
+    return remoteDataSource.deleteTask(id);
   }
 
   @override

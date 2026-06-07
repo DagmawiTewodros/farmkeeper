@@ -37,7 +37,7 @@ class DailyTasksPage extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              const Text('Saved locally', style: TextStyle(color: Colors.grey)),
+              const Text('Saved on server', style: TextStyle(color: Colors.grey)),
               const SizedBox(height: 16),
               Expanded(
                 child: tasksState.when(

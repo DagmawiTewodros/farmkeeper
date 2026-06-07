@@ -17,6 +17,9 @@ class AppDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'farmkeeper_offline.db');
 
+    
+    print('Opening local Flutter DB at: $path');
+
     return openDatabase(
       path,
       version: 2,

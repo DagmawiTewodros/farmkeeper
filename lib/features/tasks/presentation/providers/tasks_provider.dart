@@ -1,16 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/tasks_local_datasource.dart';
+import '../../data/tasks_remote_datasource.dart';
 import '../../data/tasks_repository.dart';
 import '../../data/tasks_repository_impl.dart';
 import '../../domain/task.dart';
 
-final tasksLocalDataSourceProvider = Provider<TasksLocalDataSource>((ref) {
-  return TasksLocalDataSource();
+final tasksRemoteDataSourceProvider = Provider<TasksRemoteDataSource>((ref) {
+  return TasksRemoteDataSource();
 });
 
 final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
-  return TasksRepositoryImpl(ref.watch(tasksLocalDataSourceProvider));
+  return TasksRepositoryImpl(ref.watch(tasksRemoteDataSourceProvider));
 });
 
 final tasksProvider = FutureProvider<List<Task>>((ref) async {
